@@ -1,0 +1,7 @@
+# build script #
+################
+build.sh
+
+# .love files #
+###############
+*.love
