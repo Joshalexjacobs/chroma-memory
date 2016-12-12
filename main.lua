@@ -19,8 +19,8 @@ function love.load(arg)
   math.randomseed(os.time()) -- seed love.math.rand() using os time
   love.graphics.setDefaultFilter("nearest", "nearest") -- set nearest pixel distance
 
-  --love.window.setMode(768, 432, {resizable=false, vsync=true, msaa=0, highdpi=true}) -- set the window mode
-  love.window.setMode(1136, 640, {resizable=false, vsync=true, msaa=0, highdpi=true}) -- set the window mode
+  -- currently running at the iPhone 5's native resolution (no scaling)
+  love.window.setMode(640, 1136, {resizable=false, vsync=true, msaa=0, highdpi=true}) -- set the window mode
 
   Gamestate.registerEvents()
   Gamestate.switch(game) -- swtich to game screen
