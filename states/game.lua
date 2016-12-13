@@ -2,17 +2,17 @@
 game = {}
 
 local circle = {
-  x = 300,
-  y = 400,
+  x = 75,
+  y = 75,
   r = 20, -- may be too small
   color = {225, 225, 225, 255},
 
   -- our circle's collision box
   rect = {
-    x = 280,
-    y = 380,
-    w = 40,
-    h = 40,
+    x = 50,
+    y = 50,
+    w = 50,
+    h = 50,
     draw = "line",
     color = {0, 0, 0, 255},
     touched = false
@@ -61,17 +61,19 @@ function game:draw()
   love.graphics.setColor(255, 255, 255, 255)
   love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 
+  -- play area
+  love.graphics.setColor(0, 0, 0, 150)
+  love.graphics.rectangle("line", 50, 50, 540, 540) -- outline
+  love.graphics.setColor({225, 225, 225, 30})
+  love.graphics.rectangle("fill", 50, 50, 540, 540)
+
+  -- object collision space
+  love.graphics.setColor(circle.rect.color)
+  love.graphics.rectangle(circle.rect.draw, circle.rect.x, circle.rect.y, circle.rect.w, circle.rect.h)
+
   -- object itself
   love.graphics.setColor(circle.color)
   love.graphics.circle("fill", circle.x, circle.y, circle.r)
-
-  -- object collision space
-  --love.graphics.setColor(circle.rect.color)
-  --love.graphics.rectangle(circle.rect.draw, circle.rect.x, circle.rect.y, circle.rect.w, circle.rect.h)
-
-  -- play area
-  --love.graphics.setColor({225, 225, 225, 255})
-  --love.graphics.rectangle("fill", 0, 0, 1, 1)
 
   -- invisible grid
   --love.graphics.rectangle("line", 40, 0, 1, 1136)
