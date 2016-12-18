@@ -56,9 +56,9 @@ function updateVectors(obj)
   obj.right.v3.x, obj.right.v3.y = obj.x + lowest, obj.y - lowest
 end
 
-function addCircle(x, y)
+function addCircle(x, y, n)
   local newCircle = copy(circle, newCircle)
-
+  newCircle.x, newCircle.y = x, y
   newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
   newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
 
@@ -67,16 +67,23 @@ function addCircle(x, y)
   table.insert(circles, newCircle)
 end
 
---function circles:generate(w, h)
---
---end
+function generateCircles(x, y, w, h, cSize)
+  local rows = w / cSize
+  local cols = h / cSize
 
-local function checkDir(x2, y2, x3, y3, xPos, yPos)
+  for i = 1, rows do
+    for j = 1, cols do
+      addCircle(x + cSize * j, y + cSize * i)
+    end
+  end
+end
+
+local function checkDir(x2, y2, x3, y3, xPos, yPos, obj)
   v1 = {x = 0, y = 0}
   v2 = {x = 0, y = 0}
 
   -- x1/y1 are circle.x/circle.y
-  x1, y1 = circle.x, circle.y
+  x1, y1 = obj.x, obj.y
 
   -- bool b0 = (Vector(P.x - A.x, P.y - A.y) * Vector(A.y - B.y, B.x - A.x) > 0);
   v1.x, v1.y = xPos - x1, yPos - y1
@@ -111,31 +118,43 @@ function circlePressed(x, y)
     if x > newCircle.rect.x and x < newCircle.rect.x + newCircle.rect.w and
     y > newCircle.rect.y and y < newCircle.rect.y + newCircle.rect.h then
       newCircle.rect.touched = true
-    elseif newCircle.rect.touched then
+    else --elseif newCircle.rect.touched then
       newCircle.rect.touched = false
     end
   end
 end
 
-function circleReleased(x, y)
+function circleReleased(x, y, playArea)
   for _, newCircle in ipairs(circles) do
     if newCircle.rect.touched then
-      if checkDir(newCircle.right.v2.x, newCircle.right.v2.y, newCircle.right.v3.x, newCircle.right.v3.y, x, y) then -- move right
-        newCircle.x = newCircle.x + 50
-        newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
-      elseif checkDir(newCircle.left.v2.x, newCircle.left.v2.y, newCircle.left.v3.x, newCircle.left.v3.y, x, y) then -- move left
-        newCircle.x = newCircle.x - 50
-        newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
-      elseif checkDir(newCircle.down.v2.x, newCircle.down.v2.y, newCircle.down.v3.x, newCircle.down.v3.y, x, y) then -- move down
-        newCircle.y = newCircle.y + 50
-        newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
-      elseif checkDir(newCircle.up.v2.x, newCircle.up.v2.y, newCircle.up.v3.x, newCircle.up.v3.y, x, y) then -- move up
-        newCircle.y = newCircle.y - 50
-        newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
+
+      if x > newCircle.rect.x and x < newCircle.rect.x + newCircle.rect.w and y > newCircle.rect.y and y < newCircle.rect.y + newCircle.rect.h then
+        -- do nothing
+      elseif checkDir(newCircle.right.v2.x, newCircle.right.v2.y, newCircle.right.v3.x, newCircle.right.v3.y, x, y, newCircle) then -- move right
+        if newCircle.x + 50 < playArea.w + playArea.x then
+          newCircle.x = newCircle.x + 50
+          newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
+        end
+      elseif checkDir(newCircle.left.v2.x, newCircle.left.v2.y, newCircle.left.v3.x, newCircle.left.v3.y, x, y, newCircle) then -- move left
+        if newCircle.x - 50 > playArea.x then
+          newCircle.x = newCircle.x - 50
+          newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
+        end
+      elseif checkDir(newCircle.down.v2.x, newCircle.down.v2.y, newCircle.down.v3.x, newCircle.down.v3.y, x, y, newCircle) then -- move down
+        if newCircle.y + 50 < playArea.h + playArea.y then
+          newCircle.y = newCircle.y + 50
+          newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
+        end
+      elseif checkDir(newCircle.up.v2.x, newCircle.up.v2.y, newCircle.up.v3.x, newCircle.up.v3.y, x, y, newCircle) then -- move up
+        if newCircle.y - 50 > playArea.y then
+          newCircle.y = newCircle.y - 50
+          newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
+        end
       end
 
       newCircle.rect.touched = false
       updateVectors(newCircle)
+
     end
   end
 end
@@ -153,18 +172,19 @@ end
 function drawCircles()
   for _, newCircle in ipairs(circles) do
     -- collision rect
-    love.graphics.setColor(newCircle.rect.color)
-    love.graphics.rectangle(newCircle.rect.draw, newCircle.rect.x, newCircle.rect.y, newCircle.rect.w, newCircle.rect.h)
+    --love.graphics.setColor(newCircle.rect.color)
+    --love.graphics.rectangle(newCircle.rect.draw, newCircle.rect.x, newCircle.rect.y, newCircle.rect.w, newCircle.rect.h)
 
     -- circle
     love.graphics.setColor(newCircle.color)
     love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r)
 
-    -- vectors
+    --[[ vectors
     love.graphics.setColor(newCircle.rect.color)
     love.graphics.polygon("line", newCircle.x, newCircle.y, newCircle.up.v2.x, newCircle.up.v2.y, newCircle.up.v3.x, newCircle.up.v3.y)
     love.graphics.polygon("line", newCircle.x, newCircle.y, newCircle.down.v2.x, newCircle.down.v2.y, newCircle.down.v3.x, newCircle.down.v3.y)
     love.graphics.polygon("line", newCircle.x, newCircle.y, newCircle.left.v2.x, newCircle.left.v2.y, newCircle.left.v3.x, newCircle.left.v3.y)
     love.graphics.polygon("line", newCircle.x, newCircle.y, newCircle.right.v2.x, newCircle.right.v2.y, newCircle.right.v3.x, newCircle.right.v3.y)
+    ]]
   end
 end

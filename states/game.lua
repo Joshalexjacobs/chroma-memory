@@ -10,6 +10,8 @@ local playArea = {
   h = 550
 }
 
+local circleSize = 50
+
 function game:keypressed(key, code)
   if key == 'escape' then -- quit on escape
     love.event.quit()
@@ -25,7 +27,7 @@ function game:touchpressed(id, x, y, dx, dy, pressure)
 end
 
 function game:touchreleased(id, x, y, dx, dy, pressure)
-  circleReleased(x, y)
+  circleReleased(x, y, playArea)
 end
 
 function game:touchmoved(id, x, y, dx, dy, pressure)
@@ -33,7 +35,7 @@ function game:touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function game:enter()
-  addCircle()
+  generateCircles(20, 75, playArea.w, playArea.h, circleSize)
 end
 
 function game:update(dt)
