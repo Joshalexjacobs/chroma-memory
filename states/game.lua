@@ -1,44 +1,9 @@
 -- game.lua
 game = {}
 
-local circle = {
-  x = 70,
-  y = 125,
-  r = 20, -- may be too small
-  color = {225, 225, 225, 255},
+require "circles"
 
-  -- our circle's collision box
-  rect = {
-    x = 0,
-    y = 0,
-    w = 50,
-    h = 50,
-    pad = 5, -- padding
-    draw = "line",
-    color = {0, 0, 0, 255},
-    touched = false
-  },
-
-  up = {
-    v2 = {x = 0, y = 0},
-    v3 = {x = 0, y = 0}
-  },
-
-  down = {
-    v2 = {x = 0, y = 0},
-    v3 = {x = 0, y = 0}
-  },
-
-  left = {
-    v2 = {x = 0, y = 0},
-    v3 = {x = 0, y = 0}
-  },
-
-  right = {
-    v2 = {x = 0, y = 0},
-    v3 = {x = 0, y = 0}
-  }
-}
+--[[
 
 function circle:checkDir(x2, y2, x3, y3, xPos, yPos)
   v1 = {x = 0, y = 0}
@@ -75,20 +40,7 @@ function circle:checkDir(x2, y2, x3, y3, xPos, yPos)
   end
 end
 
-function circle:updateVectors()
-  local lowest = 800
-  circle.up.v2.x, circle.up.v2.y = circle.x - lowest, circle.y - lowest
-  circle.up.v3.x, circle.up.v3.y = circle.x + lowest, circle.y - lowest
-
-  circle.down.v2.x, circle.down.v2.y = circle.x + lowest, circle.y + lowest
-  circle.down.v3.x, circle.down.v3.y = circle.x - lowest, circle.y + lowest
-
-  circle.left.v2.x, circle.left.v2.y = circle.x - lowest, circle.y + lowest
-  circle.left.v3.x, circle.left.v3.y = circle.x - lowest, circle.y - lowest
-
-  circle.right.v2.x, circle.right.v2.y = circle.x + lowest, circle.y + lowest
-  circle.right.v3.x, circle.right.v3.y = circle.x + lowest, circle.y - lowest
-end
+]]
 
 function game:keypressed(key, code)
   if key == 'escape' then -- quit on escape
@@ -97,15 +49,18 @@ function game:keypressed(key, code)
 end
 
 function game:touchpressed(id, x, y, dx, dy, pressure)
+  --[[
   if x > circle.rect.x and x < circle.rect.x + circle.rect.w and
   y > circle.rect.y and y < circle.rect.y + circle.rect.h then
     circle.rect.touched = true
   elseif circle.rect.touched then
     circle.rect.touched = false
   end
+  ]]
 end
 
 function game:touchreleased(id, x, y, dx, dy, pressure)
+  --[[
   if circle.rect.touched then
     if circle:checkDir(circle.right.v2.x, circle.right.v2.y, circle.right.v3.x, circle.right.v3.y, x, y) then -- move right
       circle.x = circle.x + 50
@@ -124,6 +79,7 @@ function game:touchreleased(id, x, y, dx, dy, pressure)
     circle.rect.touched = false
     circle:updateVectors()
   end
+  ]]
 end
 
 function game:touchmoved(id, x, y, dx, dy, pressure)
@@ -131,19 +87,17 @@ function game:touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function game:enter()
-  -- set up circle
-  circle.rect.x = circle.x - circle.r - circle.rect.pad
-  circle.rect.y = circle.y - circle.r - circle.rect.pad
-
-  circle:updateVectors()
+  addCircle()
 end
 
 function game:update(dt)
+  --[[
   if circle.rect.touched == true then
     circle.color = {0, 0, 255, 100}
   elseif circle.rect.touched == false then
     circle.color = {225, 225, 225, 255}
   end
+  ]]
 end
 
 function game:draw()
@@ -162,19 +116,5 @@ function game:draw()
     love.graphics.rectangle("line", 45, 100 + i * 50, 550, 1)
   end
 
-  -- object collision space
-  love.graphics.setColor(circle.rect.color)
-  love.graphics.rectangle(circle.rect.draw, circle.rect.x, circle.rect.y, circle.rect.w, circle.rect.h)
-
-  -- object itself
-  love.graphics.setColor(circle.color)
-  love.graphics.circle("fill", circle.x, circle.y, circle.r)
-
-  --[[
-  love.graphics.setColor(circle.rect.color)
-  love.graphics.polygon("line", circle.x, circle.y, circle.up.v2.x, circle.up.v2.y, circle.up.v3.x, circle.up.v3.y)
-  love.graphics.polygon("line", circle.x, circle.y, circle.down.v2.x, circle.down.v2.y, circle.down.v3.x, circle.down.v3.y)
-  love.graphics.polygon("line", circle.x, circle.y, circle.left.v2.x, circle.left.v2.y, circle.left.v3.x, circle.left.v3.y)
-  love.graphics.polygon("line", circle.x, circle.y, circle.right.v2.x, circle.right.v2.y, circle.right.v3.x, circle.right.v3.y)
-  ]]
+  drawCircles()
 end
