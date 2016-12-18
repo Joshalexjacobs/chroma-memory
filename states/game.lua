@@ -3,44 +3,12 @@ game = {}
 
 require "circles"
 
---[[
-
-function circle:checkDir(x2, y2, x3, y3, xPos, yPos)
-  v1 = {x = 0, y = 0}
-  v2 = {x = 0, y = 0}
-
-  -- x1/y1 are circle.x/circle.y
-  x1, y1 = circle.x, circle.y
-
-  -- bool b0 = (Vector(P.x - A.x, P.y - A.y) * Vector(A.y - B.y, B.x - A.x) > 0);
-  v1.x, v1.y = xPos - x1, yPos - y1
-  v2.x, v2.y = y1 - y2, x2 - x1
-
-  b0 = v1.x * v2.x + v1.y * v2.y
-  b0 = b0 > 0
-
-  -- bool b1 = (Vector(P.x - B.x, P.y - B.y) * Vector(B.y - C.y, C.x - B.x) > 0);
-  v1.x, v1.y = xPos - x2, yPos - y2
-  v2.x, v2.y = y2 - y3, x3 - x2
-
-  b1 = v1.x * v2.x + v1.y * v2.y
-  b1 = b1 > 0
-
-  -- bool b2 = (Vector(P.x - C.x, P.y - C.y) * Vector(C.y - A.y, A.x - C.x) > 0);
-  v1.x, v1.y = xPos - x3, yPos - y3
-  v2.x, v2.y = y3 - y1, x1 - x3
-
-  b2 = v1.x * v2.x + v1.y * v2.y
-  b2 = b2 > 0
-
-  if b0 == b1 and b1 == b2 then
-    return true
-  else
-    return false
-  end
-end
-
-]]
+local playArea = {
+  x = 45,
+  y = 100,
+  w = 550,
+  h = 550
+}
 
 function game:keypressed(key, code)
   if key == 'escape' then -- quit on escape
@@ -49,37 +17,15 @@ function game:keypressed(key, code)
 end
 
 function game:touchpressed(id, x, y, dx, dy, pressure)
-  --[[
-  if x > circle.rect.x and x < circle.rect.x + circle.rect.w and
-  y > circle.rect.y and y < circle.rect.y + circle.rect.h then
-    circle.rect.touched = true
-  elseif circle.rect.touched then
-    circle.rect.touched = false
+  -- if touch is inside playArea...
+  if x >= playArea.x and x <= playArea.x + playArea.w and
+  y >= playArea.y and y <= playArea.y + playArea.h then
+    circlePressed(x, y)
   end
-  ]]
 end
 
 function game:touchreleased(id, x, y, dx, dy, pressure)
-  --[[
-  if circle.rect.touched then
-    if circle:checkDir(circle.right.v2.x, circle.right.v2.y, circle.right.v3.x, circle.right.v3.y, x, y) then -- move right
-      circle.x = circle.x + 50
-      circle.rect.x = circle.x - circle.r - circle.rect.pad
-    elseif circle:checkDir(circle.left.v2.x, circle.left.v2.y, circle.left.v3.x, circle.left.v3.y, x, y) then -- move left
-      circle.x = circle.x - 50
-      circle.rect.x = circle.x - circle.r - circle.rect.pad
-    elseif circle:checkDir(circle.down.v2.x, circle.down.v2.y, circle.down.v3.x, circle.down.v3.y, x, y) then -- move down
-      circle.y = circle.y + 50
-      circle.rect.y = circle.y - circle.r - circle.rect.pad
-    elseif circle:checkDir(circle.up.v2.x, circle.up.v2.y, circle.up.v3.x, circle.up.v3.y, x, y) then -- move up
-      circle.y = circle.y - 50
-      circle.rect.y = circle.y - circle.r - circle.rect.pad
-    end
-
-    circle.rect.touched = false
-    circle:updateVectors()
-  end
-  ]]
+  circleReleased(x, y)
 end
 
 function game:touchmoved(id, x, y, dx, dy, pressure)
@@ -91,13 +37,7 @@ function game:enter()
 end
 
 function game:update(dt)
-  --[[
-  if circle.rect.touched == true then
-    circle.color = {0, 0, 255, 100}
-  elseif circle.rect.touched == false then
-    circle.color = {225, 225, 225, 255}
-  end
-  ]]
+  updateCircles()
 end
 
 function game:draw()
@@ -106,14 +46,14 @@ function game:draw()
 
   -- play area
   love.graphics.setColor(0, 0, 0, 150)
-  love.graphics.rectangle("line", 45, 100, 550, 550) -- outline 540 x 540 1 circle is 50 x 50
+  love.graphics.rectangle("line", playArea.x, playArea.y, playArea.w, playArea.h) -- outline 550 x 550 1 circle is 50 x 50
   love.graphics.setColor({225, 225, 225, 30})
-  love.graphics.rectangle("fill", 45, 100, 550, 550)
+  love.graphics.rectangle("fill", playArea.x, playArea.y, playArea.w, playArea.h)
 
   -- invisible grid
   for i = 1, 10 do
-    love.graphics.rectangle("line", 45 + i * 50, 100, 1, 550)
-    love.graphics.rectangle("line", 45, 100 + i * 50, 550, 1)
+    love.graphics.rectangle("line", playArea.x + i * 50, playArea.y, 1, playArea.h) -- vertical
+    love.graphics.rectangle("line", playArea.x, playArea.y + i * 50, playArea.w, 1) -- horizontal
   end
 
   drawCircles()
