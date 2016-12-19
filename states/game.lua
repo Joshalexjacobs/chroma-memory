@@ -10,7 +10,7 @@ local playArea = {
   h = 550
 }
 
-local circleSize = 50
+local circleSize = 68.75
 
 function game:keypressed(key, code)
   if key == 'escape' then -- quit on escape
@@ -35,7 +35,13 @@ function game:touchmoved(id, x, y, dx, dy, pressure)
 end
 
 function game:enter()
-  generateCircles(20, 75, playArea.w, playArea.h, circleSize)
+  local colors = {
+    {225, 50, 50, 150}, -- 1 light red
+    {225, 225, 50, 150}, -- 2 light yellow
+    {100, 255, 100, 150}, -- 3 
+  }
+
+  generateCircles(11.25, 66.25, playArea.w, playArea.h, circleSize, colors)
 end
 
 function game:update(dt)
@@ -53,9 +59,9 @@ function game:draw()
   love.graphics.rectangle("fill", playArea.x, playArea.y, playArea.w, playArea.h)
 
   -- invisible grid
-  for i = 1, 10 do
-    love.graphics.rectangle("line", playArea.x + i * 50, playArea.y, 1, playArea.h) -- vertical
-    love.graphics.rectangle("line", playArea.x, playArea.y + i * 50, playArea.w, 1) -- horizontal
+  for i = 1, 8 do
+    love.graphics.rectangle("line", playArea.x + i * 68.75, playArea.y, 1, playArea.h) -- vertical
+    love.graphics.rectangle("line", playArea.x, playArea.y + i * 68.75, playArea.w, 1) -- horizontal
   end
 
   drawCircles()

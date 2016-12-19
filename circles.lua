@@ -3,16 +3,17 @@
 local circle = {
   x = 70,
   y = 125,
-  r = 20, -- may be too small
-  color = {225, 225, 225, 255},
+  r = 25, -- may be too small
+  color = {225, 225, 225, 255}, -- the current color
+  baseColor = {225, 225, 225, 255},
 
   -- our circle's collision box
   rect = {
     x = 0,
     y = 0,
-    w = 50,
-    h = 50,
-    pad = 5, -- padding
+    w = 68.75, --55 --50
+    h = 68.75, --55 --50
+    pad = 10, -- padding --7.5 --5
     draw = "line",
     color = {0, 0, 0, 255},
     touched = false
@@ -56,24 +57,26 @@ function updateVectors(obj)
   obj.right.v3.x, obj.right.v3.y = obj.x + lowest, obj.y - lowest
 end
 
-function addCircle(x, y, n)
+function addCircle(x, y, colors)
   local newCircle = copy(circle, newCircle)
   newCircle.x, newCircle.y = x, y
   newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
   newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
+
+  newCircle.color = colors[love.math.random(1, #colors)]
 
   updateVectors(newCircle)
 
   table.insert(circles, newCircle)
 end
 
-function generateCircles(x, y, w, h, cSize)
+function generateCircles(x, y, w, h, cSize, colors)
   local rows = w / cSize
   local cols = h / cSize
 
   for i = 1, rows do
     for j = 1, cols do
-      addCircle(x + cSize * j, y + cSize * i)
+      addCircle(x + cSize * j, y + cSize * i, colors)
     end
   end
 end
@@ -131,23 +134,23 @@ function circleReleased(x, y, playArea)
       if x > newCircle.rect.x and x < newCircle.rect.x + newCircle.rect.w and y > newCircle.rect.y and y < newCircle.rect.y + newCircle.rect.h then
         -- do nothing
       elseif checkDir(newCircle.right.v2.x, newCircle.right.v2.y, newCircle.right.v3.x, newCircle.right.v3.y, x, y, newCircle) then -- move right
-        if newCircle.x + 50 < playArea.w + playArea.x then
-          newCircle.x = newCircle.x + 50
+        if newCircle.x + newCircle.rect.w < playArea.w + playArea.x then
+          newCircle.x = newCircle.x + newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
         end
       elseif checkDir(newCircle.left.v2.x, newCircle.left.v2.y, newCircle.left.v3.x, newCircle.left.v3.y, x, y, newCircle) then -- move left
-        if newCircle.x - 50 > playArea.x then
-          newCircle.x = newCircle.x - 50
+        if newCircle.x - newCircle.rect.w > playArea.x then
+          newCircle.x = newCircle.x - newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
         end
       elseif checkDir(newCircle.down.v2.x, newCircle.down.v2.y, newCircle.down.v3.x, newCircle.down.v3.y, x, y, newCircle) then -- move down
-        if newCircle.y + 50 < playArea.h + playArea.y then
-          newCircle.y = newCircle.y + 50
+        if newCircle.y + newCircle.rect.h < playArea.h + playArea.y then
+          newCircle.y = newCircle.y + newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
         end
       elseif checkDir(newCircle.up.v2.x, newCircle.up.v2.y, newCircle.up.v3.x, newCircle.up.v3.y, x, y, newCircle) then -- move up
-        if newCircle.y - 50 > playArea.y then
-          newCircle.y = newCircle.y - 50
+        if newCircle.y - newCircle.rect.h > playArea.y then
+          newCircle.y = newCircle.y - newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
         end
       end
@@ -160,13 +163,15 @@ function circleReleased(x, y, playArea)
 end
 
 function updateCircles()
+  --[[
   for _, newCircle in ipairs(circles) do
     if newCircle.rect.touched == true then
       newCircle.color = {0, 0, 255, 100}
     elseif newCircle.rect.touched == false then
-      newCircle.color = {225, 225, 225, 255}
+      newCircle.color = newCircle.baseColor
     end
   end
+  ]]
 end
 
 function drawCircles()
@@ -175,9 +180,22 @@ function drawCircles()
     --love.graphics.setColor(newCircle.rect.color)
     --love.graphics.rectangle(newCircle.rect.draw, newCircle.rect.x, newCircle.rect.y, newCircle.rect.w, newCircle.rect.h)
 
+    if newCircle.rect.touched then
+      love.graphics.setColor({newCircle.color[1], newCircle.color[2], newCircle.color[3], 50})
+      love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 5)
+      love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 10)
+      love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 15)
+      --love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 20)
+      --love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 25)
+    end
+
     -- circle
     love.graphics.setColor(newCircle.color)
     love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r)
+
+    --if newCircle.touched then
+
+    --end
 
     --[[ vectors
     love.graphics.setColor(newCircle.rect.color)
