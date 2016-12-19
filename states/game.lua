@@ -7,7 +7,7 @@ local playArea = {
   x = 45,
   y = 100,
   w = 550,
-  h = 550
+  h = 962.5 -- 550 1237.5
 }
 
 local circleSize = 68.75
@@ -38,7 +38,8 @@ function game:enter()
   local colors = {
     {225, 50, 50, 150}, -- 1 light red
     {225, 225, 50, 150}, -- 2 light yellow
-    {100, 255, 100, 150}, -- 3 
+    {100, 255, 100, 150}, -- 3 light green
+    {50, 150, 225, 150}, -- 4 light blue
   }
 
   generateCircles(11.25, 66.25, playArea.w, playArea.h, circleSize, colors)

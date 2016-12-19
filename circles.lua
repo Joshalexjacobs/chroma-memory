@@ -6,6 +6,7 @@ local circle = {
   r = 25, -- may be too small
   color = {225, 225, 225, 255}, -- the current color
   baseColor = {225, 225, 225, 255},
+  connected = false,
 
   -- our circle's collision box
   rect = {
@@ -74,11 +75,12 @@ function generateCircles(x, y, w, h, cSize, colors)
   local rows = w / cSize
   local cols = h / cSize
 
-  for i = 1, rows do
-    for j = 1, cols do
+  for i = 1, cols do
+    for j = 1, rows do
       addCircle(x + cSize * j, y + cSize * i, colors)
     end
   end
+  print(#circles)
 end
 
 local function checkDir(x2, y2, x3, y3, xPos, yPos, obj)
@@ -128,30 +130,54 @@ function circlePressed(x, y)
 end
 
 function circleReleased(x, y, playArea)
-  for _, newCircle in ipairs(circles) do
+  for i, newCircle in ipairs(circles) do
     if newCircle.rect.touched then
 
       if x > newCircle.rect.x and x < newCircle.rect.x + newCircle.rect.w and y > newCircle.rect.y and y < newCircle.rect.y + newCircle.rect.h then
         -- do nothing
       elseif checkDir(newCircle.right.v2.x, newCircle.right.v2.y, newCircle.right.v3.x, newCircle.right.v3.y, x, y, newCircle) then -- move right
         if newCircle.x + newCircle.rect.w < playArea.w + playArea.x then
+          circles[i + 1].x, circles[i + 1].y, circles[i + 1].rect.x = newCircle.x, newCircle.y, newCircle.rect.x
           newCircle.x = newCircle.x + newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
+
+          -- swap index as well
+          local temp = circles[i]
+          circles[i] = circles[i + 1]
+          circles[i + 1] = temp
         end
       elseif checkDir(newCircle.left.v2.x, newCircle.left.v2.y, newCircle.left.v3.x, newCircle.left.v3.y, x, y, newCircle) then -- move left
         if newCircle.x - newCircle.rect.w > playArea.x then
+          circles[i - 1].x, circles[i - 1].y, circles[i - 1].rect.x = newCircle.x, newCircle.y, newCircle.rect.x
           newCircle.x = newCircle.x - newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
+
+          -- swap index as well
+          local temp = circles[i]
+          circles[i] = circles[i - 1]
+          circles[i - 1] = temp
         end
       elseif checkDir(newCircle.down.v2.x, newCircle.down.v2.y, newCircle.down.v3.x, newCircle.down.v3.y, x, y, newCircle) then -- move down
         if newCircle.y + newCircle.rect.h < playArea.h + playArea.y then
+          circles[i + 8].x, circles[i + 8].y, circles[i + 8].rect.y = newCircle.x, newCircle.y, newCircle.rect.y
           newCircle.y = newCircle.y + newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
+
+          -- swap index as well
+          local temp = circles[i]
+          circles[i] = circles[i + 8]
+          circles[i + 8] = temp
         end
       elseif checkDir(newCircle.up.v2.x, newCircle.up.v2.y, newCircle.up.v3.x, newCircle.up.v3.y, x, y, newCircle) then -- move up
         if newCircle.y - newCircle.rect.h > playArea.y then
+          circles[i - 8].x, circles[i - 8].y, circles[i - 8].rect.y = newCircle.x, newCircle.y, newCircle.rect.y
           newCircle.y = newCircle.y - newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
+
+          -- swap index as well
+          local temp = circles[i]
+          circles[i] = circles[i - 8]
+          circles[i - 8] = temp
         end
       end
 
@@ -175,7 +201,7 @@ function updateCircles()
 end
 
 function drawCircles()
-  for _, newCircle in ipairs(circles) do
+  for i, newCircle in ipairs(circles) do
     -- collision rect
     --love.graphics.setColor(newCircle.rect.color)
     --love.graphics.rectangle(newCircle.rect.draw, newCircle.rect.x, newCircle.rect.y, newCircle.rect.w, newCircle.rect.h)
@@ -192,6 +218,9 @@ function drawCircles()
     -- circle
     love.graphics.setColor(newCircle.color)
     love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r)
+
+    love.graphics.setColor({0, 0, 0, 255})
+    love.graphics.printf(i, newCircle.rect.x, newCircle.y - 5, newCircle.rect.w, "center")
 
     --if newCircle.touched then
 
