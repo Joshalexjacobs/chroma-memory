@@ -5,6 +5,7 @@ local circle = {
   y = 125,
   r = 25, -- may be too small
   color = {225, 225, 225, 255}, -- the current color
+  colorCode = nil, -- used for easily comparing colors
   baseColor = {225, 225, 225, 255},
   connected = false,
 
@@ -20,6 +21,7 @@ local circle = {
     touched = false
   },
 
+  -- vectors
   up = {
     v2 = {x = 0, y = 0},
     v3 = {x = 0, y = 0}
@@ -43,7 +45,7 @@ local circle = {
 
 local circles = {}
 
-function updateVectors(obj)
+local function updateVectors(obj)
   local lowest = 800
   obj.up.v2.x, obj.up.v2.y = obj.x - lowest, obj.y - lowest
   obj.up.v3.x, obj.up.v3.y = obj.x + lowest, obj.y - lowest
@@ -58,13 +60,15 @@ function updateVectors(obj)
   obj.right.v3.x, obj.right.v3.y = obj.x + lowest, obj.y - lowest
 end
 
-function addCircle(x, y, colors)
+local function addCircle(x, y, colors)
   local newCircle = copy(circle, newCircle)
   newCircle.x, newCircle.y = x, y
   newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
   newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
 
-  newCircle.color = colors[love.math.random(1, #colors)]
+  local color = colors[love.math.random(1, #colors)]
+  newCircle.color = color
+  newCircle.colorCode = tostring(color[1]) .. tostring(color[2]) .. tostring(color[3]) .. tostring(color[4])
 
   updateVectors(newCircle)
 
@@ -80,7 +84,7 @@ function generateCircles(x, y, w, h, cSize, colors)
       addCircle(x + cSize * j, y + cSize * i, colors)
     end
   end
-  print(#circles)
+
 end
 
 local function checkDir(x2, y2, x3, y3, xPos, yPos, obj)
@@ -141,7 +145,7 @@ function circleReleased(x, y, playArea)
           newCircle.x = newCircle.x + newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
 
-          -- swap index as well
+          -- swap index
           local temp = circles[i]
           circles[i] = circles[i + 1]
           circles[i + 1] = temp
@@ -152,7 +156,7 @@ function circleReleased(x, y, playArea)
           newCircle.x = newCircle.x - newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
 
-          -- swap index as well
+          -- swap index
           local temp = circles[i]
           circles[i] = circles[i - 1]
           circles[i - 1] = temp
@@ -163,7 +167,7 @@ function circleReleased(x, y, playArea)
           newCircle.y = newCircle.y + newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
 
-          -- swap index as well
+          -- swap index
           local temp = circles[i]
           circles[i] = circles[i + 8]
           circles[i + 8] = temp
@@ -174,7 +178,7 @@ function circleReleased(x, y, playArea)
           newCircle.y = newCircle.y - newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
 
-          -- swap index as well
+          -- swap index
           local temp = circles[i]
           circles[i] = circles[i - 8]
           circles[i - 8] = temp
@@ -188,16 +192,24 @@ function circleReleased(x, y, playArea)
   end
 end
 
-function updateCircles()
-  --[[
-  for _, newCircle in ipairs(circles) do
-    if newCircle.rect.touched == true then
-      newCircle.color = {0, 0, 255, 100}
-    elseif newCircle.rect.touched == false then
-      newCircle.color = newCircle.baseColor
-    end
+--[[
+  neighbors = {
+    up = -8,
+    down = 8,
+    right = 1,
+    left = -1
+  },
+]]
+
+
+local function checkNeighbors()
+  for i, newCircle in ipairs(circles) do -- check all circle's neighbors
+    -- check to see if the neighboring circles share the same color by comparing their colorCode
   end
-  ]]
+end
+
+function updateCircles()
+  --checkNeighbors()
 end
 
 function drawCircles()
@@ -211,20 +223,16 @@ function drawCircles()
       love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 5)
       love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 10)
       love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 15)
-      --love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 20)
-      --love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r + 25)
     end
 
     -- circle
-    love.graphics.setColor(newCircle.color)
+    if newCircle.connected or newCircle.rect.touched then
+      love.graphics.setColor(newCircle.color)
+    else
+      love.graphics.setColor(newCircle.baseColor)
+    end
+
     love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r)
-
-    love.graphics.setColor({0, 0, 0, 255})
-    love.graphics.printf(i, newCircle.rect.x, newCircle.y - 5, newCircle.rect.w, "center")
-
-    --if newCircle.touched then
-
-    --end
 
     --[[ vectors
     love.graphics.setColor(newCircle.rect.color)

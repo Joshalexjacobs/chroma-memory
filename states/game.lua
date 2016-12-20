@@ -60,10 +60,10 @@ function game:draw()
   love.graphics.rectangle("fill", playArea.x, playArea.y, playArea.w, playArea.h)
 
   -- invisible grid
-  for i = 1, 8 do
-    love.graphics.rectangle("line", playArea.x + i * 68.75, playArea.y, 1, playArea.h) -- vertical
-    love.graphics.rectangle("line", playArea.x, playArea.y + i * 68.75, playArea.w, 1) -- horizontal
-  end
+  --for i = 1, 8 do
+    --love.graphics.rectangle("line", playArea.x + i * 68.75, playArea.y, 1, playArea.h) -- vertical
+    --love.graphics.rectangle("line", playArea.x, playArea.y + i * 68.75, playArea.w, 1) -- horizontal
+  --end
 
   drawCircles()
 end
