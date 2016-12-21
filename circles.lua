@@ -9,6 +9,16 @@ local circle = {
   baseColor = {225, 225, 225, 255},
   connected = false,
 
+  col = 0,
+  row = 0,
+
+  neighbors = {
+    right = nil,
+    left = nil,
+    up = nil,
+    down = nil
+  },
+
   -- our circle's collision box
   rect = {
     x = 0,
@@ -60,7 +70,7 @@ local function updateVectors(obj)
   obj.right.v3.x, obj.right.v3.y = obj.x + lowest, obj.y - lowest
 end
 
-local function addCircle(x, y, colors)
+local function addCircle(x, y, colors, col, row)
   local newCircle = copy(circle, newCircle)
   newCircle.x, newCircle.y = x, y
   newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
@@ -70,18 +80,22 @@ local function addCircle(x, y, colors)
   newCircle.color = color
   newCircle.colorCode = tostring(color[1]) .. tostring(color[2]) .. tostring(color[3]) .. tostring(color[4])
 
+  -- set each circle's column and row
+  newCircle.col, newCircle.row = col, row
+
   updateVectors(newCircle)
 
   table.insert(circles, newCircle)
 end
 
 function generateCircles(x, y, w, h, cSize, colors)
-  local rows = w / cSize
-  local cols = h / cSize
+  local rows = h / cSize
+  local cols = w / cSize
 
-  for i = 1, cols do
-    for j = 1, rows do
-      addCircle(x + cSize * j, y + cSize * i, colors)
+
+  for i = 1, rows do
+    for j = 1, cols do
+      addCircle(x + cSize * j, y + cSize * i, colors, j, i)
     end
   end
 
@@ -133,6 +147,17 @@ function circlePressed(x, y)
   end
 end
 
+local function swapCircle(index, x)
+  -- swap row, column, and circle's index
+  local tempRow, tempCol = circles[index].row, circles[index].col
+  local temp = circles[index]
+  circles[index].row, circles[index].col = circles[index + x].row, circles[index + x].col
+  circles[index] = circles[index + x]
+
+  circles[index + x].row, circles[index + x].col = tempRow, tempCol
+  circles[index + x] = temp
+end
+
 function circleReleased(x, y, playArea)
   for i, newCircle in ipairs(circles) do
     if newCircle.rect.touched then
@@ -145,10 +170,7 @@ function circleReleased(x, y, playArea)
           newCircle.x = newCircle.x + newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
 
-          -- swap index
-          local temp = circles[i]
-          circles[i] = circles[i + 1]
-          circles[i + 1] = temp
+          swapCircle(i, 1)
         end
       elseif checkDir(newCircle.left.v2.x, newCircle.left.v2.y, newCircle.left.v3.x, newCircle.left.v3.y, x, y, newCircle) then -- move left
         if newCircle.x - newCircle.rect.w > playArea.x then
@@ -156,10 +178,7 @@ function circleReleased(x, y, playArea)
           newCircle.x = newCircle.x - newCircle.rect.w
           newCircle.rect.x = newCircle.x - newCircle.r - newCircle.rect.pad
 
-          -- swap index
-          local temp = circles[i]
-          circles[i] = circles[i - 1]
-          circles[i - 1] = temp
+          swapCircle(i, -1)
         end
       elseif checkDir(newCircle.down.v2.x, newCircle.down.v2.y, newCircle.down.v3.x, newCircle.down.v3.y, x, y, newCircle) then -- move down
         if newCircle.y + newCircle.rect.h < playArea.h + playArea.y then
@@ -167,10 +186,7 @@ function circleReleased(x, y, playArea)
           newCircle.y = newCircle.y + newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
 
-          -- swap index
-          local temp = circles[i]
-          circles[i] = circles[i + 8]
-          circles[i + 8] = temp
+          swapCircle(i, 8)
         end
       elseif checkDir(newCircle.up.v2.x, newCircle.up.v2.y, newCircle.up.v3.x, newCircle.up.v3.y, x, y, newCircle) then -- move up
         if newCircle.y - newCircle.rect.h > playArea.y then
@@ -178,10 +194,7 @@ function circleReleased(x, y, playArea)
           newCircle.y = newCircle.y - newCircle.rect.h
           newCircle.rect.y = newCircle.y - newCircle.r - newCircle.rect.pad
 
-          -- swap index
-          local temp = circles[i]
-          circles[i] = circles[i - 8]
-          circles[i - 8] = temp
+          swapCircle(i, -8)
         end
       end
 
@@ -204,7 +217,7 @@ end
 
 local function checkNeighbors()
   for i, newCircle in ipairs(circles) do -- check all circle's neighbors
-    -- check to see if the neighboring circles share the same color by comparing their colorCode
+    --newCircle.neighbors.up/down/left/right = 
   end
 end
 
@@ -233,6 +246,11 @@ function drawCircles()
     end
 
     love.graphics.circle("fill", newCircle.x, newCircle.y, newCircle.r)
+
+    love.graphics.setColor({0, 0, 0, 255})
+    --love.graphics.printf(i, newCircle.x, newCircle.y, 100)
+    love.graphics.printf(tostring(newCircle.row) .. " - " .. tostring(newCircle.col) , newCircle.x, newCircle.y, 100)
+    --love.graphics.printf(newCircle.col, newCircle.x, newCircle.y, 100)
 
     --[[ vectors
     love.graphics.setColor(newCircle.rect.color)
