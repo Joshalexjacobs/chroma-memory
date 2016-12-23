@@ -7,7 +7,8 @@ local playArea = {
   x = 45,
   y = 100,
   w = 550,
-  h = 962.5 -- 550 1237.5
+  h = 962.5,
+  cSize = 68.75
 }
 
 local circleSize = 68.75
@@ -42,7 +43,7 @@ function game:enter()
     {50, 150, 225, 150}, -- 4 light blue
   }
 
-  generateCircles(11.25, 66.25, playArea.w, playArea.h, circleSize, colors)
+  generateCircles(11.25, 66.25, playArea.w, playArea.h, playArea.cSize, colors)
 end
 
 function game:update(dt)

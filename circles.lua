@@ -98,7 +98,6 @@ function generateCircles(x, y, w, h, cSize, colors)
       addCircle(x + cSize * j, y + cSize * i, colors, j, i)
     end
   end
-
 end
 
 local function checkDir(x2, y2, x3, y3, xPos, yPos, obj)
@@ -205,24 +204,45 @@ function circleReleased(x, y, playArea)
   end
 end
 
---[[
-  neighbors = {
-    up = -8,
-    down = 8,
-    right = 1,
-    left = -1
-  },
-]]
-
-
 local function checkNeighbors()
-  for i, newCircle in ipairs(circles) do -- check all circle's neighbors
-    --newCircle.neighbors.up/down/left/right = 
+  for i, newCircle in ipairs(circles) do -- check every circle's neighbors
+    -- right
+    if newCircle.col ~= 8 then
+      newCircle.neighbors.right = circles[i + 1]
+      if newCircle.neighbors.right.colorCode == newCircle.colorCode then
+        newCircle.connected = true
+      end
+    end
+
+    -- left
+    if newCircle.col ~= 1 then
+      newCircle.neighbors.left = circles[i - 1]
+      if newCircle.neighbors.left.colorCode == newCircle.colorCode then
+        newCircle.connected = true
+      end
+    end
+
+    -- up
+    if newCircle.row ~= 1 then
+      newCircle.neighbors.up = circles[i - 8]
+      if newCircle.neighbors.up.colorCode == newCircle.colorCode then
+        newCircle.connected = true
+      end
+    end
+
+    -- down
+    if newCircle.row ~= 14 then
+      newCircle.neighbors.down = circles[i + 8]
+      if newCircle.neighbors.down.colorCode == newCircle.colorCode then
+        newCircle.connected = true
+      end
+    end
+
   end
 end
 
 function updateCircles()
-  --checkNeighbors()
+  checkNeighbors()
 end
 
 function drawCircles()
@@ -250,7 +270,7 @@ function drawCircles()
     love.graphics.setColor({0, 0, 0, 255})
     --love.graphics.printf(i, newCircle.x, newCircle.y, 100)
     love.graphics.printf(tostring(newCircle.row) .. " - " .. tostring(newCircle.col) , newCircle.x, newCircle.y, 100)
-    --love.graphics.printf(newCircle.col, newCircle.x, newCircle.y, 100)
+    --love.graphics.printf(newCircle.colorCode, newCircle.x - 25, newCircle.y, 50)
 
     --[[ vectors
     love.graphics.setColor(newCircle.rect.color)
