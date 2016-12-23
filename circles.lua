@@ -206,11 +206,14 @@ end
 
 local function checkNeighbors()
   for i, newCircle in ipairs(circles) do -- check every circle's neighbors
+    local connection = false -- keep track if a circle is disconnected
+    
     -- right
     if newCircle.col ~= 8 then
       newCircle.neighbors.right = circles[i + 1]
       if newCircle.neighbors.right.colorCode == newCircle.colorCode then
         newCircle.connected = true
+        connection = true
       end
     end
 
@@ -219,6 +222,7 @@ local function checkNeighbors()
       newCircle.neighbors.left = circles[i - 1]
       if newCircle.neighbors.left.colorCode == newCircle.colorCode then
         newCircle.connected = true
+        connection = true
       end
     end
 
@@ -227,6 +231,7 @@ local function checkNeighbors()
       newCircle.neighbors.up = circles[i - 8]
       if newCircle.neighbors.up.colorCode == newCircle.colorCode then
         newCircle.connected = true
+        connection = true
       end
     end
 
@@ -235,7 +240,12 @@ local function checkNeighbors()
       newCircle.neighbors.down = circles[i + 8]
       if newCircle.neighbors.down.colorCode == newCircle.colorCode then
         newCircle.connected = true
+        connection = true
       end
+    end
+
+    if connection == false then
+      newCircle.connected = false
     end
 
   end

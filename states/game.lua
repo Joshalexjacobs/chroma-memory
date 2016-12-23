@@ -41,6 +41,8 @@ function game:enter()
     {225, 225, 50, 150}, -- 2 light yellow
     {100, 255, 100, 150}, -- 3 light green
     {50, 150, 225, 150}, -- 4 light blue
+    {255, 135, 0, 150}, -- 5 orange
+    {0, 0, 0, 150}, -- 6 black/dark gray
   }
 
   generateCircles(11.25, 66.25, playArea.w, playArea.h, playArea.cSize, colors)
