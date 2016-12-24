@@ -1,5 +1,6 @@
 -- circles.lua
 
+
 local circle = {
   x = 70,
   y = 125,
@@ -207,7 +208,7 @@ end
 local function checkNeighbors()
   for i, newCircle in ipairs(circles) do -- check every circle's neighbors
     local connection = false -- keep track if a circle is disconnected
-    
+
     -- right
     if newCircle.col ~= 8 then
       newCircle.neighbors.right = circles[i + 1]
@@ -290,4 +291,6 @@ function drawCircles()
     love.graphics.polygon("line", newCircle.x, newCircle.y, newCircle.right.v2.x, newCircle.right.v2.y, newCircle.right.v3.x, newCircle.right.v3.y)
     ]]
   end
+
+  love.graphics.printf("Circle count: " .. tostring(#circles), 0, 0, 150)
 end
