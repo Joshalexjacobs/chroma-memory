@@ -13,6 +13,10 @@ local circle = {
   col = 0,
   row = 0,
 
+  moving = false,
+  dx = 0,
+  dy = 0,
+
   neighbors = {
     right = nil,
     left = nil,
@@ -254,6 +258,12 @@ end
 
 function updateCircles()
   checkNeighbors()
+
+  for _, newCircle in ipairs(circles) do
+    if newCircle.moving then
+      -- update circle's dx/dy and move circle towards destination
+    end
+  end
 end
 
 function drawCircles()
