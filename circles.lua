@@ -16,6 +16,12 @@ local circle = {
   moving = false,
   dx = 0,
   dy = 0,
+  speed = 10,
+
+  destination = {
+    x = nil,
+    y = nil
+  },
 
   neighbors = {
     right = nil,
@@ -91,6 +97,10 @@ local function addCircle(x, y, colors, col, row)
   updateVectors(newCircle)
 
   table.insert(circles, newCircle)
+end
+
+function loadCircle()
+  -- load circle images
 end
 
 function generateCircles(x, y, w, h, cSize, colors)
@@ -256,14 +266,17 @@ local function checkNeighbors()
   end
 end
 
-function updateCircles()
+function updateCircles(dt)
   checkNeighbors()
 
+  --[[
   for _, newCircle in ipairs(circles) do
     if newCircle.moving then
       -- update circle's dx/dy and move circle towards destination
+
     end
   end
+  ]]
 end
 
 function drawCircles()

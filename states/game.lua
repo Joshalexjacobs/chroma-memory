@@ -49,7 +49,7 @@ function game:enter()
 end
 
 function game:update(dt)
-  updateCircles()
+  updateCircles(dt)
 end
 
 function game:draw()
