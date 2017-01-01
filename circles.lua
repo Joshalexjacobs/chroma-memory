@@ -8,6 +8,7 @@ local circle = {
   color = {225, 225, 225, 255}, -- the current color
   colorCode = nil, -- used for easily comparing colors
   baseColor = {225, 225, 225, 255},
+  sprite = nil,
   connected = false,
 
   col = 0,
@@ -101,6 +102,7 @@ end
 
 function loadCircle()
   -- load circle images
+  circle.sprite = love.graphics.newImage("img/circleSmall.png")
 end
 
 function generateCircles(x, y, w, h, cSize, colors)
@@ -280,6 +282,8 @@ function updateCircles(dt)
 end
 
 function drawCircles()
+  local connections = 0
+
   for i, newCircle in ipairs(circles) do
     -- collision rect
     --love.graphics.setColor(newCircle.rect.color)
@@ -294,6 +298,7 @@ function drawCircles()
 
     -- circle
     if newCircle.connected or newCircle.rect.touched then
+      connections = connections + 1
       love.graphics.setColor(newCircle.color)
     else
       love.graphics.setColor(newCircle.baseColor)
@@ -315,5 +320,5 @@ function drawCircles()
     ]]
   end
 
-  love.graphics.printf("Circle count: " .. tostring(#circles), 0, 0, 150)
+  love.graphics.printf(connections .. "/" .. tostring(#circles), 0, 50, 130, "center")
 end
